@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <canvas id="canvas"></canvas>
+    <script type="module" src="/src/main.ts"></script>
+    <script id="vertex" type="x-shader/x-vertex">
+      varying vec2 vertexUV;
+      varying vec3 vertexNormal;
+
+      void main() {
+          vertexUV = uv;
+          vertexNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    </script>
+
+    <script id="fragment" type="x-shader/x-fragment">
+      uniform sampler2D globeTexture;
+      varying vec2 vertexUV;
+      void main() {
+          gl_FragColor = vec4(texture2D(globeTexture, vertexUV).xyz, 1.0);
+      }
+    </script>
+
+    <script id="atmosphereVertex" type="x-shader/x-vertex">
+      varying vec3 vertexNormal;
+      void main() {
+          vertexNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.9);
+      }
+    </script>
+
+    <script id="atmosphereFragment" type="x-shader/x-fragment">
+      varying vec3 vertexNormal;
+      void main() {
+        float intensity = pow(0.5 - dot(vertexNormal, vec3(-0.4, -0.2, 1.0)), 9.5);
+        gl_FragColor = vec4(0.5, 0.353, 0.3, 1.0) * intensity;
+      }
+    </script>
+  </body>
+</html>
